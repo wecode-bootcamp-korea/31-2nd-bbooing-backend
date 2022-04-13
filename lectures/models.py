@@ -10,6 +10,9 @@ class Lecture(TimeStampedModel):
     category            = models.ForeignKey('Category', on_delete=models.CASCADE)
     title               = models.CharField(max_length=100)
     price               = models.DecimalField(max_digits=9, decimal_places=2)
+    notice         = models.CharField(max_length=3000, default='text')
+    summary        = models.CharField(max_length=3000, default='text')
+    recommendation = models.CharField(max_length=3000, default='text')
     thumbnail_image_url = models.URLField(max_length=2000)
 
     class Meta:
