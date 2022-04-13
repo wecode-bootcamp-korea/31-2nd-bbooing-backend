@@ -10,3 +10,10 @@ class Review(TimeStampedModel):
 
     class Meta:
         db_table = 'reviews'
+
+class ReviewImage(TimeStampedModel):
+    review   = models.ForeignKey('Review', on_delete=models.CASCADE)
+    image_url = models.URLField(max_length=2000)
+
+    class Meta:
+        db_table = 'review_images'
