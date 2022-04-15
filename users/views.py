@@ -8,17 +8,17 @@ from django.views import View
 
 from .models import *
 
-class KakoAPI:
+class KakaoAPI:
     def __init__(self, access_token):
         self.access_token = access_token
-        self.user_url     = 'https://kapi.kakao.com//v2/user/me'
+        self.user_url     = 'https://kapi.kakao.com/v2/user/me'
 
     def get_kakao_user(self):
         try:
             headers  = {'Authorization' : f'Bearer {self.access_token}'}
-            response = requests.get(self.user_url, headers = headers, timeout=2.5)
+            response = requests.get(self.user_url, headers = headers, timeout = 2.5)
 
-            if not response.code == 200: 
+            if not response.status_code == 200: 
                 return JsonResponse({'message':'INVALID_USER'}, status = 401)
 
             return response.json() 
@@ -29,16 +29,15 @@ class KakaoLoginView(View):
     def post(self, request):
         try: 
             kakao_token = request.headers.get('Authorization')
-            kakao_user  = KakoAPI(kakao_token)
+            kakao_user  = KakaoAPI(kakao_token).get_kakao_user
 
             kakao_id       = kakao_user['id']
             kakao_nickname = kakao_user['properties']['nickname']
-            kakao_email    = kakao_user['kakao_account']['email']
             profile_image  = kakao_user['properties']['profile_image']
 
             user, is_created = User.objects.get_or_create(
                 kakao_id = kakao_id,
-                defaults = {'kakao_nickname' : kakao_nickname, 'kakao_email' : kakao_email, 'profile_image' : profile_image}
+                defaults = {'kakao_nickname' : kakao_nickname, 'profile_image' : profile_image}
             )
             
             data = {
