@@ -1,5 +1,6 @@
 import jwt
 
+from django.db import connection, reset_queries
 from django.conf import settings
 from django.http import JsonResponse
 
@@ -21,5 +22,5 @@ def token_validate(func):
             return JsonResponse({'message': 'invalid_user'}, status=400)
         except jwt.exceptions.ExpiredSignatureError:
             return JsonResponse({'message': 'expired_token'}, status=400)
-
+        
     return wrapper
