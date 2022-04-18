@@ -1,7 +1,47 @@
+from django.db.models import Q, Count
+
 from django.http  import JsonResponse
 from django.views import View
 
 from lectures.models import Lecture, LectureImage
+
+class LectureListView(View):
+    def get(self, request):
+        offset      = int(request.GET.get('offset', 0))
+        limit       = int(request.GET.get('limit', 12))
+
+        filter_list_set = {
+            'category_id'  : 'category_id__in',
+            'types_id'     : 'typelecture__type__id__in',
+            'regions'      : 'regionlecture__region__region__in',
+            'schedules'    : 'schedulelecture__schedule__schedule__in'
+        }
+
+        filter_set = {
+            'title'        : 'title__icontains',
+        }
+
+        q = {**{filter_list_set[key] : value for key, value in dict(request.GET).items() if filter_list_set.get(key)},
+             **{filter_set[key] : value for key, value in request.GET.items() if filter_set.get(key)}}
+        
+        lectures = Lecture.objects.select_related('category')\
+                                  .prefetch_related('regions', 'schedules', 'types','lectureimage_set')\
+                                  .annotate(likes_total = Count('like__id'))\
+                                  .filter(**q).order_by('-id')[offset : offset + limit]
+
+        result = [{
+                'lecture_id': lecture.id,
+                'regions'   : [region.region for region in lecture.regions.all()],
+                'schedules' : [schedule.schedule for schedule in lecture.schedules.all()],
+                'type_names': [type.type for type in lecture.types.all()],
+                'category'  : lecture.category.name,
+                'title'     : lecture.title,
+                'price'     : lecture.price,
+                'likes'     : lecture.likes_total,
+                'images'    : [image.image_url for image in lecture.lectureimage_set.all()]
+        } for lecture in lectures]
+
+        return JsonResponse({'result' : result}, status = 200)
 
 class LectureDetailView(View):
     def get(self, request, lecture_id):
