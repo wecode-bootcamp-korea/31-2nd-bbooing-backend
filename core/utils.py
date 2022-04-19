@@ -5,7 +5,7 @@ from django.http import JsonResponse
 
 from users.models import User
 
-def token_validate(func):
+def validate_token(func):
     def wrapper(self, request, *args, **kwargs):
         try:
             access_token = request.headers.get('Authorization', None)
