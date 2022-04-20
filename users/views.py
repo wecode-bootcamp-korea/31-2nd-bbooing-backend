@@ -29,7 +29,7 @@ class KakaoLoginView(View):
     def post(self, request):
         try: 
             kakao_token = request.headers.get('Authorization')
-            kakao_user  = KakaoAPI(kakao_token).get_kakao_user
+            kakao_user  = KakaoAPI(kakao_token).get_kakao_user()
 
             kakao_id       = kakao_user['id']
             kakao_nickname = kakao_user['properties']['nickname']
@@ -48,7 +48,7 @@ class KakaoLoginView(View):
             
             status_code  = 201 if is_created else 200
             
-            return JsonResponse({'access_token' : data}, status = status_code)
-
+            return JsonResponse(data, status = status_code) 
+            
         except KeyError:
             return JsonResponse({'message' : 'KEY_ERROR'}, status = 400)
