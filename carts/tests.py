@@ -101,10 +101,3 @@ class CartViewTest(TestCase):
         response = client.delete('/carts/like/1', content_type='application/json', **headers)
 
         self.assertEqual(response.status_code, 204)
-
-
-
-
-
-
-
