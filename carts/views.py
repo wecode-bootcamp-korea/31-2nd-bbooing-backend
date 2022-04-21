@@ -16,6 +16,10 @@ class CartView(View):
                 lectures_id = lectures_id,
             )
 
+            if not is_created:
+                like.delete()
+                return JsonResponse({'message': "deleted!"}, status=204)
+
             return JsonResponse({'message': "success"}, status=201)
 
         except KeyError:
@@ -27,6 +31,7 @@ class CartView(View):
         likes = Like.objects.filter(user_id=user.id)
 
         results = [{
+            "lecture_id"    : like.lectures_id,
             "like_id"       : like.id,
             "thumbnail_url" : like.lectures.thumbnail_image_url,
             "name"          : like.lectures.title,

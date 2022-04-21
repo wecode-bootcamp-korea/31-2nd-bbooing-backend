@@ -52,6 +52,7 @@ class CartViewTest(TestCase):
 
         self.assertEqual(response.json(), {
             'results': [{
+                'lecture_id': 1,
                 'like_id': 1,
                 'thumbnail_url': '',
                 'name': '베인앤컴퍼니 출신의 논리적으로 일하는 법',
@@ -60,20 +61,6 @@ class CartViewTest(TestCase):
             }]
         })
         self.assertEqual(response.status_code, 200)
-
-    def test_cart_post_like_already_exists_success(self):
-        client       = Client()
-        access_token = jwt.encode({
-            'user_id': 1,
-            'exp': datetime.utcnow() + timedelta(days=1)
-        }, settings.SECRET_KEY, settings.ALGORITHM)
-
-        headers      = {'HTTP_Authorization': access_token}
-
-        response = client.post('/carts/like/1', content_type='application/json', **headers)
-
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.json(), {'message': "success"})
 
     def test_cart_post_like_success(self):
         client       = Client()

@@ -21,5 +21,4 @@ def validate_token(func):
             return JsonResponse({'message': 'invalid_user'}, status=400)
         except jwt.exceptions.ExpiredSignatureError:
             return JsonResponse({'message': 'expired_token'}, status=400)
-        
     return wrapper
