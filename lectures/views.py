@@ -69,7 +69,7 @@ class LectureDetailView(View):
     def get(self, request, lecture_id):
         try:
             lecture = Lecture.objects\
-                             .prefetch_related('schedulelecture_set', 'regionlecture_set', 'review_set','typelecture_set')\
+                             .prefetch_related('schedulelecture_set', 'regionlecture_set', 'review_set', 'typelecture_set', 'review_set__reviewimage_set')\
                              .get(id=lecture_id)
             images = LectureImage.objects.filter(lecture_id=lecture_id)
 
@@ -77,9 +77,9 @@ class LectureDetailView(View):
                 'title'         : lecture.title,
                 'thumbnail'     : lecture.thumbnail_image_url,
                 'price'         : lecture.price,
-                'notice'        : lecture.notice,
-                'summary'       : lecture.summary,
-                'recommendation': lecture.recommendation,
+                'notice'        : lecture.notice.rstrip('\n'),
+                'summary'       : lecture.summary.rstrip('\n'),
+                'recommendation': lecture.recommendation.rstrip('\n'),
                 'types'         : lecture.typelecture_set.get().type.type,
                 'schedule'      : lecture.schedulelecture_set.get().schedule.schedule,
                 'region'        : lecture.regionlecture_set.get().region.region,
@@ -88,7 +88,9 @@ class LectureDetailView(View):
                     'user'         : review.user.kakao_nickname,
                     'profile_image': review.user.profile_image,
                     'content'      : review.content,
-                    'create'       : review.create_at
+                    'create'       : review.create_at,
+                    'review_image' : [reviewimage.image_url for reviewimage in review.reviewimage_set.all()],
+                    'review_id'    : review.id
                 } for review in lecture.review_set.all()]
             }
 
